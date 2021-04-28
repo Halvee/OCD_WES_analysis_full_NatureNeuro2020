@@ -1,0 +1,83 @@
+The code contained here was used in the Halvorsen et al. analysis of OCD exomes
+that was submitted to Nature Neuroscience journal. We have not included large
+sample-level input data here, but rather are showing code used to generate
+analysis results, figures and tables within the manuscript. 
+
+The steps in running the analysis code were as follows:
+
+00.input.sh : 
+Build input data required for analysis.
+
+01.run_clps_rate_analysis.sh :
+Call the Rscript 01.run_clps_rate_analysis.R, which analyzes the burden of LoF
+variants in a European case/control cohort, specifically all OCD cases from the
+cohort against the subset of controls that are listed as 'control' or 
+'healthy family member'. 
+
+02.build_mut_rate_tbls.sh :
+Build tables of mutation rate per annotation per single protein-coding gene in
+the exome. 
+
+03.trio_coverage.sh : 
+Compile the number of trios jointly covered at least 10x over each individual
+CCDS base. Combine this information with annotation information and base-level
+mutation rate to get the expected mutation rate for 587 OCD trios for each
+gene/annotation.
+
+04.dnm_casectrl_prepare.sh :
+Provide the same annotations to both cases and controls (GRCh37.87, CCDS
+r20 transcripts only). Remove variants that have MAF > 0.0005 in a gnomAD
+global or subpopulation cohort. For each variant, mark whether or not it falls
+within loci that are well-covered (>=90% with at least 10x cov) in both trio cases 
+and external samples on the same Roche EZCap V2 kit as control trios.
+
+05.dnm_rate_caco.sh :
+Call the Rscript 05.dnm_rate_caco.R, which assesses :
+1) DNM rate summary statistics across OCD trios
+2) the observed DNM rate per annotation versus expectation, based on DNM calls
+from 1911 control trios and from expected mutation rate based on sequence
+content and trio coverage.
+3) observed/expected DNM rate of LoF mutations in LOEUF bins.
+4) Case/control comparison of the burden of missense variants that are absent
+from gnomAD, stratified across MPC bins (0-1, 1-2, >2).
+5) observed/expected rate of MisD/LoF mutations in neurodevelopmental disorder
+genes, TS probable risk genes.
+6) LoF DNM burden stratified by annotation (stopgain, splice, frameshift)
+
+06.dnm_genebased.sh :
+Call the Rscript 06.dnm_genebased.R, which conducts one-sided poisson tests of
+observed versus expected MisD/LoF mutation rate in single protein-coding genes
+across a combined cohort of 771 trios (587 from this study, 184 from 
+Cappi et al. 2019).
+
+07.prep_extTADA.sh : 
+Call the Rscript 07.prep_extTADA.R, which builds an input table of gene-based
+counts of DNMs and case/control qualified variants that is passed to extTADA.
+
+08.run_extTADA.sh :
+Calls the Rscript 08.run_extTADA.R, which conducts extTADA analysis on input
+gene-based DNM and case/control qualified variant counts.
+
+09.clinical.sh :
+Calls the Rscript 09.clinical.R, which tests for an association between the
+presence of at least one damaging de novo mutation (LoF in gene with LOEUF<10%,
+or MisD with MPC>2) and 4 seperate binary clinical traits. Afterwards, runs a
+supplemental LoF rate comparison in non-trio OCD cases to compare rates in male
+versus female cases, using the previously utilized Rscript
+01.run_clps_rate_analysis.R.
+
+10.misc.sh : 
+Generate additional figures and tables which may have been requested as
+supplemental figures and tables.
+
+11.mainfigures.sh :
+Compile the set of main figure PDFs used in the manuscript.
+
+12.suppfigures.sh : 
+Compile the set of supplemental figure PDFs used in the manuscript. Roll the
+figures into a single docx file, along with figure captions. Page numbers and
+table of contents are manually added to docx file afterwards.
+
+13.supptables.sh :
+Compile the set of supplemental table CSVs used in the manuscript. Roll the
+tables into a single xlsx file, along with table legends. 
